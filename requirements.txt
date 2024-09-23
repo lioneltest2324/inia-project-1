@@ -1,5 +1,4 @@
 altair==5.2.0
-numpy==1.23.4
 pandas==1.5.1
 pyarrow==11.0.0
 st_gsheets_connection==0.0.3
