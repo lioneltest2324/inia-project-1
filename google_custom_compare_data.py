@@ -92,7 +92,7 @@ compare_ads_cost_df = create_date_filtered_df(ads_campaign_daily, 'Date', compar
 select_ads_cost_df = compare_ads_cost_df[compare_ads_cost_df['Campaign Name'].isin(campaign_options)]
 select_ads_conversion_df = compare_ads_conversion_df[compare_ads_conversion_df['Campaign Name'].isin(campaign_options)]
 select_ads_combine_df = pd.merge(select_ads_cost_df,select_ads_conversion_df,on=['Date','Campaign Name'], how='left')
-select_ads_combine_df = select_ads_combine_df[['Date','Campaign Name','impression','click','cost','all conversions','all conversion value']]
+select_ads_combine_df = output_groupby_df(select_ads_combine_df,['Date'], ['impression','click','cost','all conversions','all conversion value'], 'sum').reset_index()
 select_ads_combine_df= add_custom_proportion_to_df(select_ads_combine_df,'all conversion value','cost','ads ROI')
 select_ads_combine_df= add_custom_proportion_to_df(select_ads_combine_df,'cost','click','CPC')
 select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'click','impression','CTR')
