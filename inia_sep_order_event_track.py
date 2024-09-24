@@ -24,4 +24,4 @@ user_id = ga4_event_track_filter_order_select_df['用户ID']
 ga4_event_track_filter_order_select_df = ga4_event_track[ga4_event_track['用户ID'].isin(user_id)]
 ga4_event_track_filter_order_select_df = ga4_event_track_filter_order_select_df.drop(columns=['用户ID','触发事件属性','出单订单号码'])
 ga4_event_track_filter_order_select_df = ga4_event_track_filter_order_select_df.sort_values(by="时间",ascending=False)
-st.dataframe(ga4_event_track_filter_order_select_df,height=300, width=2400)
+st.dataframe(ga4_event_track_filter_order_select_df,height=1000, width=2400)
