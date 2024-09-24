@@ -29,4 +29,4 @@ ads_daliy_summary_df= add_custom_proportion_to_df(ads_daliy_summary_df,'cost','c
 ads_daliy_summary_df = add_custom_proportion_to_df(ads_daliy_summary_df,'click','impression','CTR')
 ads_daliy_summary_df = add_custom_proportion_to_df(ads_daliy_summary_df,'all conversions','click','CVR')
 
-st.dataframe(ads_daliy_summary_df,width=3000, height=700)
+st.dataframe(ads_daliy_summary_df,width=2000, height=1000)
