@@ -62,7 +62,7 @@ compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,
 
 all_combine_df = create_compare_summary_df(ads_daily_sum_df, compare_ads_daily_sum_df,['日期范围','impression','click','cost','all conversions','all conversion value','ads ROI','CPC','CTR','CVR'])
 st.subheader("自选时间范围内谷歌全数据总览以及对比(不区分广告)")
-st.dataframe(all_combine_df,width=2400, height=200)
+st.dataframe(all_combine_df,width=1800, height=200)
 
 st.subheader("自选时间范围内广告细分数据(不区分广告)")
 ads_campaign_daily['Date'] = pd.to_datetime(ads_campaign_daily['Date'])
@@ -79,7 +79,7 @@ compare_ads_combine_df= add_custom_proportion_to_df(compare_ads_combine_df,'all 
 compare_ads_combine_df= add_custom_proportion_to_df(compare_ads_combine_df,'cost','click','CPC')
 compare_ads_combine_df = add_custom_proportion_to_df(compare_ads_combine_df,'click','impression','CTR')
 compare_ads_combine_df = add_custom_proportion_to_df(compare_ads_combine_df,'all conversions','click','CVR')
-st.dataframe(compare_ads_combine_df,width=2400, height=300)
+st.dataframe(compare_ads_combine_df,width=1800, height=300)
 
 st.subheader("自选时间范围内自选广告日维度数据")
 unique_campaign_name = ads_campaign_daily['Campaign Name'].unique()
@@ -98,4 +98,4 @@ select_ads_combine_df= add_custom_proportion_to_df(select_ads_combine_df,'cost',
 select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'click','impression','CTR')
 select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'all conversions','click','CVR')
 select_ads_combine_df['Date'] = select_ads_combine_df['Date'].dt.strftime('%Y-%m-%d')
-st.dataframe(select_ads_combine_df,width=2400, height=600)
+st.dataframe(select_ads_combine_df,width=1800, height=600)
