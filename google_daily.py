@@ -19,7 +19,9 @@ conversion_action_options = st.multiselect(
     unique_conversion_action,
     ['Purchase']
 )
-combine_campaign_df = pd.merge(ads_conversion_daily,ads_campaign_daily,on=['Date','Campaign Name'], how='left')
+ads_campaign_daily = output_groupby_df(ads_campaign_daily,['Date'], ['impression','cost','click'], 'sum').reset_index()
+ads_conversion_daily = output_groupby_df(ads_conversion_daily,['Date','conversion action'], ['all conversions','all conversion value'], 'sum').reset_index()
+combine_campaign_df = pd.merge(ads_conversion_daily,ads_campaign_daily,on=['Date'], how='left')
 combine_campaign_df = combine_campaign_df[combine_campaign_df['conversion action'].isin(conversion_action_options)]
 ads_daliy_summary_df = output_groupby_df(combine_campaign_df,['Date'], ['impression','cost','click','all conversions','all conversion value'], 'sum').reset_index()
 ads_daliy_summary_df= add_custom_proportion_to_df(ads_daliy_summary_df,'all conversion value','cost','ads ROI')
