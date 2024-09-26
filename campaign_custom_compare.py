@@ -63,8 +63,8 @@ ads_daily_sum_df['all conversion value'] = combine_campaign_df['all conversion v
 ads_daily_sum_df = ads_daily_sum_df[['日期范围','impression','click','cost','all conversions','all conversion value']]
 ads_daily_sum_df= add_custom_proportion_to_df(ads_daily_sum_df,'all conversion value','cost','ads ROI')
 ads_daily_sum_df= add_custom_proportion_to_df(ads_daily_sum_df,'cost','click','CPC')
-ads_daily_sum_df = add_custom_proportion_to_df(ads_daily_sum_df,'click','impression','CTR')
-ads_daily_sum_df = add_custom_proportion_to_df(ads_daily_sum_df,'all conversions','click','CVR')
+ads_daily_sum_df = add_custom_proportion_to_df_x100(ads_daily_sum_df,'click','impression','CTR')
+ads_daily_sum_df = add_custom_proportion_to_df_x100(ads_daily_sum_df,'all conversions','click','CVR')
 ads_daily_sum_df = add_custom_proportion_to_df(ads_daily_sum_df,'cost','all conversions','CPA')
 ads_daily_sum_df = add_custom_proportion_to_df(ads_daily_sum_df,'all conversion value','all conversions','AOV')
 
@@ -79,8 +79,8 @@ compare_ads_daily_sum_df['all conversion value'] = compare_combine_campaign_df['
 compare_ads_daily_sum_df = compare_ads_daily_sum_df[['日期范围','impression','click','cost','all conversions','all conversion value']]
 compare_ads_daily_sum_df= add_custom_proportion_to_df(compare_ads_daily_sum_df,'all conversion value','cost','ads ROI')
 compare_ads_daily_sum_df= add_custom_proportion_to_df(compare_ads_daily_sum_df,'cost','click','CPC')
-compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'click','impression','CTR')
-compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'all conversions','click','CVR')
+compare_ads_daily_sum_df = add_custom_proportion_to_df_x100(compare_ads_daily_sum_df,'click','impression','CTR')
+compare_ads_daily_sum_df = add_custom_proportion_to_df_x100(compare_ads_daily_sum_df,'all conversions','click','CVR')
 compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'cost','all conversions','CPA')
 compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'all conversion value','all conversions','AOV')
 
