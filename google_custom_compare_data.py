@@ -24,6 +24,18 @@ ads_conversion_sum_daily = output_groupby_df(ads_conversion_daily,['Date','conve
 combine_campaign_df = pd.merge(ads_conversion_sum_daily,ads_campaign_sum_daily,on=['Date'], how='left')
 combine_campaign_df = combine_campaign_df[combine_campaign_df['conversion action'].isin(conversion_action_options)]
 
+column_config = {}
+column_config['CTR'] = st.column_config.NumberColumn(
+    format='%.2f%%',  # 显示为百分比
+    min_value=0,
+    max_value=1,
+            )
+column_config['CVR'] = st.column_config.NumberColumn(
+    format='%.2f%%',  # 显示为百分比
+    min_value=0,
+    max_value=1,
+            )
+
 with st.sidebar:
     selected_range = out_date_range_data(combine_campaign_df, 'Date', "对比数据日期范围")
     compare_selected_range = out_date_range_data(combine_campaign_df, 'Date', "自选日期范围")
@@ -44,8 +56,8 @@ ads_daily_sum_df['all conversion value'] = ads_daily_filtered_date_range_df['all
 ads_daily_sum_df = ads_daily_sum_df[['日期范围','impression','click','cost','all conversions','all conversion value']]
 ads_daily_sum_df= add_custom_proportion_to_df(ads_daily_sum_df,'all conversion value','cost','ads ROI')
 ads_daily_sum_df= add_custom_proportion_to_df(ads_daily_sum_df,'cost','click','CPC')
-ads_daily_sum_df = add_custom_proportion_to_df(ads_daily_sum_df,'click','impression','CTR')
-ads_daily_sum_df = add_custom_proportion_to_df(ads_daily_sum_df,'all conversions','click','CVR')
+ads_daily_sum_df = add_custom_proportion_to_df_x100(ads_daily_sum_df,'click','impression','CTR')
+ads_daily_sum_df = add_custom_proportion_to_df_x100(ads_daily_sum_df,'all conversions','click','CVR')
 ads_daily_sum_df = add_custom_proportion_to_df(ads_daily_sum_df,'cost','all conversions','CPA')
 ads_daily_sum_df = add_custom_proportion_to_df(ads_daily_sum_df,'all conversion value','all conversions','AOV')
 
@@ -60,15 +72,16 @@ compare_ads_daily_sum_df['all conversion value'] = compare_ads_daily_filtered_da
 compare_ads_daily_sum_df = compare_ads_daily_sum_df[['日期范围','impression','click','cost','all conversions','all conversion value']]
 compare_ads_daily_sum_df= add_custom_proportion_to_df(compare_ads_daily_sum_df,'all conversion value','cost','ads ROI')
 compare_ads_daily_sum_df= add_custom_proportion_to_df(compare_ads_daily_sum_df,'cost','click','CPC')
-compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'click','impression','CTR')
-compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'all conversions','click','CVR')
+compare_ads_daily_sum_df = add_custom_proportion_to_df_x100(compare_ads_daily_sum_df,'click','impression','CTR')
+compare_ads_daily_sum_df = add_custom_proportion_to_df_x100(compare_ads_daily_sum_df,'all conversions','click','CVR')
 compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'cost','all conversions','CPA')
 compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'all conversion value','all conversions','AOV')
 
 
 all_combine_df = create_compare_summary_df(ads_daily_sum_df, compare_ads_daily_sum_df,['日期范围','impression','click','cost','all conversions','all conversion value','ads ROI','CPC','CTR','CVR','CPA','AOV'])
 st.subheader("自选时间范围内谷歌全数据总览以及对比(不区分广告)")
-st.dataframe(all_combine_df,width=2000, height=200)
+all_combine_df = all_combine_df.apply(format_comparison, axis=1)
+st.dataframe(all_combine_df,width=2000, height=200,column_config=column_config)
 
 st.subheader("自选时间范围内广告细分数据(不区分广告)")
 ads_campaign_daily['Date'] = pd.to_datetime(ads_campaign_daily['Date'])
@@ -83,12 +96,13 @@ compare_ads_conversion_summary_df = output_groupby_df(compare_ads_conversion_df,
 compare_ads_combine_df = pd.merge(compare_ads_cost_summary_df,compare_ads_conversion_summary_df,on=['Campaign Name'], how='left')
 compare_ads_combine_df= add_custom_proportion_to_df(compare_ads_combine_df,'all conversion value','cost','ads ROI')
 compare_ads_combine_df= add_custom_proportion_to_df(compare_ads_combine_df,'cost','click','CPC')
-compare_ads_combine_df = add_custom_proportion_to_df(compare_ads_combine_df,'click','impression','CTR')
-compare_ads_combine_df = add_custom_proportion_to_df(compare_ads_combine_df,'all conversions','click','CVR')
+compare_ads_combine_df = add_custom_proportion_to_df_x100(compare_ads_combine_df,'click','impression','CTR')
+compare_ads_combine_df = add_custom_proportion_to_df_x100(compare_ads_combine_df,'all conversions','click','CVR')
 compare_ads_combine_df = add_custom_proportion_to_df(compare_ads_combine_df,'cost','all conversions','CPA')
 compare_ads_combine_df = add_custom_proportion_to_df(compare_ads_combine_df,'all conversion value','all conversions','AOV')
 
-st.dataframe(compare_ads_combine_df,width=2000, height=500)
+compare_ads_combine_d = compare_ads_combine_d.apply(format_comparison, axis=1)
+st.dataframe(compare_ads_combine_df,width=2000, height=500,column_config=column_config)
 
 st.subheader("自选时间范围内自选广告日维度数据")
 unique_campaign_name = ads_campaign_daily['Campaign Name'].unique()
@@ -104,10 +118,10 @@ select_ads_combine_df = pd.merge(select_ads_cost_df,select_ads_conversion_df,on=
 select_ads_combine_df = output_groupby_df(select_ads_combine_df,['Date'], ['impression','click','cost','all conversions','all conversion value'], 'sum').reset_index()
 select_ads_combine_df= add_custom_proportion_to_df(select_ads_combine_df,'all conversion value','cost','ads ROI')
 select_ads_combine_df= add_custom_proportion_to_df(select_ads_combine_df,'cost','click','CPC')
-select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'click','impression','CTR')
-select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'all conversions','click','CVR')
+select_ads_combine_df = add_custom_proportion_to_df_x100(select_ads_combine_df,'click','impression','CTR')
+select_ads_combine_df = add_custom_proportion_to_df_x100(select_ads_combine_df,'all conversions','click','CVR')
 select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'cost','all conversions','CPA')
 select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'all conversion value','all conversions','AOV')
 
 select_ads_combine_df['Date'] = select_ads_combine_df['Date'].dt.strftime('%Y-%m-%d')
-st.dataframe(select_ads_combine_df,width=2000, height=600)
+st.dataframe(select_ads_combine_df,width=2000, height=600,column_config=column_config)
