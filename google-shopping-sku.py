@@ -36,4 +36,5 @@ sumary_daily= add_custom_proportion_to_df(sumary_daily,'all conversion value','c
 sumary_daily= add_custom_proportion_to_df(sumary_daily,'cost','click','CPC')
 sumary_daily = add_custom_proportion_to_df(sumary_daily,'click','impression','CTR')
 sumary_daily = add_custom_proportion_to_df(sumary_daily,'all conversions','click','CVR')
+sumary_daily = add_custom_proportion_to_df(sumary_daily,'cost','all conversions','CPA')
 st.dataframe(sumary_daily,width=2000, height=400)
