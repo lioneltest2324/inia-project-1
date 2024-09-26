@@ -86,4 +86,16 @@ compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,
 
 
 all_combine_df = create_compare_summary_df(ads_daily_sum_df, compare_ads_daily_sum_df,['日期范围','impression','click','cost','all conversions','all conversion value','ads ROI','CPC','CTR','CVR','CPA','AOV'])
-st.dataframe(all_combine_df,width=2000, height=200)
+column_config = {}
+column_config['CTR'] = st.column_config.NumberColumn(
+    format='%.2f%%',  # 显示为百分比
+    min_value=0,
+    max_value=1,
+            )
+column_config['CVR'] = st.column_config.NumberColumn(
+    format='%.2f%%',  # 显示为百分比
+    min_value=0,
+    max_value=1,
+            )
+all_combine_df = all_combine_df.apply(format_comparison, axis=1)
+st.dataframe(all_combine_df,width=2000, height=200,column_config=column_config)
