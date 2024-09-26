@@ -101,5 +101,7 @@ select_ads_combine_df= add_custom_proportion_to_df(select_ads_combine_df,'all co
 select_ads_combine_df= add_custom_proportion_to_df(select_ads_combine_df,'cost','click','CPC')
 select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'click','impression','CTR')
 select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'all conversions','click','CVR')
+select_ads_combine_df = add_custom_proportion_to_df(select_ads_combine_df,'cost','all conversions','CPA')
+
 select_ads_combine_df['Date'] = select_ads_combine_df['Date'].dt.strftime('%Y-%m-%d')
 st.dataframe(select_ads_combine_df,width=2000, height=600)
