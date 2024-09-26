@@ -101,7 +101,6 @@ compare_ads_combine_df = add_custom_proportion_to_df_x100(compare_ads_combine_df
 compare_ads_combine_df = add_custom_proportion_to_df(compare_ads_combine_df,'cost','all conversions','CPA')
 compare_ads_combine_df = add_custom_proportion_to_df(compare_ads_combine_df,'all conversion value','all conversions','AOV')
 
-compare_ads_combine_df = compare_ads_combine_df.apply(format_comparison, axis=1)
 st.dataframe(compare_ads_combine_df,width=2000, height=500,column_config=column_config)
 
 st.subheader("自选时间范围内自选广告日维度数据")
