@@ -66,7 +66,7 @@ compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,
 compare_ads_daily_sum_df = add_custom_proportion_to_df(compare_ads_daily_sum_df,'all conversion value','all conversions','AOV')
 
 
-all_combine_df = create_compare_summary_df(ads_daily_sum_df, compare_ads_daily_sum_df,['日期范围','impression','click','cost','all conversions','all conversion value','ads ROI','CPC','CTR','CVR'])
+all_combine_df = create_compare_summary_df(ads_daily_sum_df, compare_ads_daily_sum_df,['日期范围','impression','click','cost','all conversions','all conversion value','ads ROI','CPC','CTR','CVR','CPA','AOV'])
 st.subheader("自选时间范围内谷歌全数据总览以及对比(不区分广告)")
 st.dataframe(all_combine_df,width=2000, height=200)
 
