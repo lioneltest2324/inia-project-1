@@ -26,8 +26,20 @@ combine_campaign_df = combine_campaign_df[combine_campaign_df['conversion action
 ads_daliy_summary_df = output_groupby_df(combine_campaign_df,['Date'], ['impression','cost','click','all conversions','all conversion value'], 'sum').reset_index()
 ads_daliy_summary_df= add_custom_proportion_to_df(ads_daliy_summary_df,'all conversion value','cost','ads ROI')
 ads_daliy_summary_df= add_custom_proportion_to_df(ads_daliy_summary_df,'cost','click','CPC')
-ads_daliy_summary_df = add_custom_proportion_to_df(ads_daliy_summary_df,'click','impression','CTR')
-ads_daliy_summary_df = add_custom_proportion_to_df(ads_daliy_summary_df,'all conversions','click','CVR')
+ads_daliy_summary_df = add_custom_proportion_to_df_x100(ads_daliy_summary_df,'click','impression','CTR')
+ads_daliy_summary_df = add_custom_proportion_to_df_x100(ads_daliy_summary_df,'all conversions','click','CVR')
 ads_daliy_summary_df = add_custom_proportion_to_df(ads_daliy_summary_df,'cost','all conversions','CPA')
 
-st.dataframe(ads_daliy_summary_df,width=1800, height=1000)
+column_config = {}
+column_config['CTR'] = st.column_config.NumberColumn(
+    format='%.2f%%',  # 显示为百分比
+    min_value=0,
+    max_value=1,
+            )
+column_config['CVR'] = st.column_config.NumberColumn(
+    format='%.2f%%',  # 显示为百分比
+    min_value=0,
+    max_value=1,
+            )
+
+st.dataframe(ads_daliy_summary_df,width=1800, height=1000,column_config=column_config)
