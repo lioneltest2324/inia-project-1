@@ -46,6 +46,9 @@ select_compare_ads_conversion_daily_filtered_date_range_df = compare_ads_convers
 ads_conversion_sum_daily = output_groupby_df(select_ads_conversion_daily_filtered_date_range_df,['Date','conversion action'], ['all conversions','all conversion value'], 'sum').reset_index()
 compare_ads_conversion_sum_daily = output_groupby_df(select_compare_ads_conversion_daily_filtered_date_range_df,['Date','conversion action'], ['all conversions','all conversion value'], 'sum').reset_index()
 
+before_action_conversion_sum_daily = ads_conversion_sum_daily
+compare_before_action_conversion_sum_daily = compare_ads_conversion_sum_daily
+
 ads_conversion_sum_daily = ads_conversion_sum_daily[ads_conversion_sum_daily['conversion action'].isin(conversion_action_options)]
 compare_ads_conversion_sum_daily = compare_ads_conversion_sum_daily[compare_ads_conversion_sum_daily['conversion action'].isin(conversion_action_options)]
 
@@ -99,3 +102,4 @@ column_config['CVR'] = st.column_config.NumberColumn(
             )
 all_combine_df = all_combine_df.apply(format_comparison, axis=1)
 st.dataframe(all_combine_df,width=2000, height=200,column_config=column_config)
+# ---------------------------------------------------------------------加购+购买区开始---------------------------------------------------------------------------------------------------
