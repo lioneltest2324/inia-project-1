@@ -7,10 +7,10 @@ import numpy as np
 from functools import reduce
 import operator
 from streamlit_tags import st_tags
-@st.cache_data(ttl=2400)
+@st.cache_data(ttl=120)
 def load_and_process_data(url,sheetname):
     conn = st.connection("gsheets", type=GSheetsConnection)
-    data_source = conn.read(spreadsheet=url, ttl="25m", worksheet=sheetname)
+    data_source = conn.read(spreadsheet=url, ttl="5m", worksheet=sheetname)
     data_df = pd.DataFrame(data_source)
     return data_df
 
