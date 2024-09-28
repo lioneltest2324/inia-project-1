@@ -14,6 +14,7 @@ ads_conversion_daily = load_and_process_data(ads_conversion_url,1848692976)
 ads_campaign_daily = ads_campaign_daily[['Date','Campaign Name','impression','click','cost','Campaign Type']]
 ads_campaign_daily  = ads_campaign_daily[~ads_campaign_daily.isnull().all(axis=1)]
 unique_conversion_action = ads_conversion_daily['conversion action'].unique()
+
 conversion_action_options = st.multiselect(
     '选择转化操作',
     unique_conversion_action,
@@ -24,6 +25,7 @@ unique_campaign_options = st.multiselect(
     '选择广告系列',
     unique_campaign
 )
+
 with st.sidebar:
     selected_range = out_date_range_data(ads_campaign_daily, 'Date', "对比数据日期范围")
     compare_selected_range = out_date_range_data(ads_campaign_daily, 'Date', "自选日期范围")
@@ -100,6 +102,106 @@ column_config['CVR'] = st.column_config.NumberColumn(
     min_value=0,
     max_value=1,
             )
+column_config['buy CVR'] = st.column_config.NumberColumn(
+    format='%.2f%%',  # 显示为百分比
+    min_value=0,
+    max_value=1,
+            )
+column_config['atc CVR'] = st.column_config.NumberColumn(
+    format='%.2f%%',  # 显示为百分比
+    min_value=0,
+    max_value=1,
+            )
 all_combine_df = all_combine_df.apply(format_comparison, axis=1)
 st.dataframe(all_combine_df,width=2000, height=200,column_config=column_config)
 # ---------------------------------------------------------------------加购+购买区开始---------------------------------------------------------------------------------------------------
+atc_action_conversion_daily = before_action_conversion_sum_daily[before_action_conversion_sum_daily['conversion action'].isin(["Add to cart"])]
+buy_action_conversion_daily = before_action_conversion_sum_daily[before_action_conversion_sum_daily['conversion action'].isin(["Purchase"])]
+
+compare_atc_action_conversion_daily = compare_before_action_conversion_sum_daily[compare_before_action_conversion_sum_daily['conversion action'].isin(["Add to cart"])]
+compare_buy_action_conversion_daily = compare_before_action_conversion_sum_daily[compare_before_action_conversion_sum_daily['conversion action'].isin(["Purchase"])]
+# ---------------------------------------------------------------------第一个对比表格---------------------------------------------------------------------------------------------------
+
+after_buy_campaign_df = pd.merge(ads_campaign_sum_daily,buy_action_conversion_daily,on=['Date'], how='left')
+combine_buy_atc_campaign_df = pd.merge(after_buy_campaign_df,atc_action_conversion_daily,on=['Date'], how='left')
+
+combine_buy_atc_campaign_df = combine_buy_atc_campaign_df.rename(columns={"all conversions_x":"buy conversions","all conversion value_x":"buy value","all conversions_y":"atc conversions"})
+combine_buy_atc_campaign_df = combine_buy_atc_campaign_df.drop(columns=['conversion action_x','conversion action_y','all conversion value_y'])
+
+combine_buy_atc_campaign_sum_df = pd.DataFrame(columns=['impression','click','cost','buy conversions','buy value','atc conversions'], data=[[0, 0, 0,0,0,0]])
+combine_buy_atc_campaign_sum_df['日期范围'] = pd.to_datetime(selected_range[0]).strftime('%Y-%m-%d')+"至"+pd.to_datetime(selected_range[1]).strftime('%Y-%m-%d')
+combine_buy_atc_campaign_sum_df['impression'] = combine_buy_atc_campaign_df['impression'].sum()
+combine_buy_atc_campaign_sum_df['click'] = combine_buy_atc_campaign_df['click'].sum()
+combine_buy_atc_campaign_sum_df['cost'] = combine_buy_atc_campaign_df['cost'].sum()
+combine_buy_atc_campaign_sum_df['buy value'] = combine_buy_atc_campaign_df['buy value'].sum()
+combine_buy_atc_campaign_sum_df['buy conversions'] = combine_buy_atc_campaign_df['buy conversions'].sum()
+combine_buy_atc_campaign_sum_df['atc conversions'] = combine_buy_atc_campaign_df['atc conversions'].sum()
+combine_buy_atc_campaign_sum_df = combine_buy_atc_campaign_sum_df[['日期范围','impression','click','cost','buy conversions','buy value','atc conversions']]
+combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'buy value','cost','ads ROI')
+combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'cost','click','CPC')
+combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df_x100(combine_buy_atc_campaign_sum_df,'click','impression','CTR')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df_x100(combine_buy_atc_campaign_sum_df,'buy conversions','click','buy CVR')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df_x100(combine_buy_atc_campaign_sum_df,'atc conversions','click','atc CVR')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'cost','buy conversions','buy CPA')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'cost','atc conversions','atc CPA')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'buy value','buy conversions','AOV')
+
+
+atc_action_conversion_daily = before_action_conversion_sum_daily[before_action_conversion_sum_daily['conversion action'].isin(["Add to cart"])]
+buy_action_conversion_daily = before_action_conversion_sum_daily[before_action_conversion_sum_daily['conversion action'].isin(["Purchase"])]
+
+compare_atc_action_conversion_daily = compare_atc_action_conversion_daily[compare_atc_action_conversion_daily['conversion action'].isin(["Add to cart"])]
+compare_buy_action_conversion_daily = compare_buy_action_conversion_daily[compare_buy_action_conversion_daily['conversion action'].isin(["Purchase"])]
+
+after_buy_campaign_df = pd.merge(ads_campaign_sum_daily,buy_action_conversion_daily,on=['Date'], how='left')
+combine_buy_atc_campaign_df = pd.merge(after_buy_campaign_df,atc_action_conversion_daily,on=['Date'], how='left')
+
+combine_buy_atc_campaign_df = combine_buy_atc_campaign_df.rename(columns={"all conversions_x":"buy conversions","all conversion value_x":"buy value","all conversions_y":"atc conversions"})
+combine_buy_atc_campaign_df = combine_buy_atc_campaign_df.drop(columns=['conversion action_x','conversion action_y','all conversion value_y'])
+
+combine_buy_atc_campaign_sum_df = pd.DataFrame(columns=['impression','click','cost','buy conversions','buy value','atc conversions'], data=[[0, 0, 0,0,0,0]])
+combine_buy_atc_campaign_sum_df['日期范围'] = pd.to_datetime(selected_range[0]).strftime('%Y-%m-%d')+"至"+pd.to_datetime(selected_range[1]).strftime('%Y-%m-%d')
+combine_buy_atc_campaign_sum_df['impression'] = combine_buy_atc_campaign_df['impression'].sum()
+combine_buy_atc_campaign_sum_df['click'] = combine_buy_atc_campaign_df['click'].sum()
+combine_buy_atc_campaign_sum_df['cost'] = combine_buy_atc_campaign_df['cost'].sum()
+combine_buy_atc_campaign_sum_df['buy value'] = combine_buy_atc_campaign_df['buy value'].sum()
+combine_buy_atc_campaign_sum_df['buy conversions'] = combine_buy_atc_campaign_df['buy conversions'].sum()
+combine_buy_atc_campaign_sum_df['atc conversions'] = combine_buy_atc_campaign_df['atc conversions'].sum()
+combine_buy_atc_campaign_sum_df = combine_buy_atc_campaign_sum_df[['日期范围','impression','click','cost','buy conversions','buy value','atc conversions']]
+combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'buy value','cost','ads ROI')
+combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'cost','click','CPC')
+combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df_x100(combine_buy_atc_campaign_sum_df,'click','impression','CTR')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df_x100(combine_buy_atc_campaign_sum_df,'buy conversions','click','buy CVR')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df_x100(combine_buy_atc_campaign_sum_df,'atc conversions','click','atc CVR')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'cost','buy conversions','buy CPA')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'cost','atc conversions','atc CPA')
+combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(combine_buy_atc_campaign_sum_df,'buy value','buy conversions','AOV')
+
+# ---------------------------------------------------------------------第二个对比表格---------------------------------------------------------------------------------------------------
+compare_after_buy_campaign_df = pd.merge(compare_ads_campaign_sum_daily,compare_buy_action_conversion_daily,on=['Date'], how='left')
+compare_combine_buy_atc_campaign_df = pd.merge(compare_after_buy_campaign_df,compare_atc_action_conversion_daily,on=['Date'], how='left')
+compare_combine_buy_atc_campaign_df = compare_combine_buy_atc_campaign_df.rename(columns={"all conversions_x":"buy conversions","all conversion value_x":"buy value","all conversions_y":"atc conversions"})
+compare_combine_buy_atc_campaign_df = compare_combine_buy_atc_campaign_df.drop(columns=['conversion action_x','conversion action_y','all conversion value_y'])
+
+compare_combine_buy_atc_campaign_sum_df = pd.DataFrame(columns=['impression','click','cost','buy conversions','buy value','atc conversions'], data=[[0, 0, 0,0,0,0]])
+compare_combine_buy_atc_campaign_sum_df['日期范围'] = pd.to_datetime(selected_range[0]).strftime('%Y-%m-%d')+"至"+pd.to_datetime(selected_range[1]).strftime('%Y-%m-%d')
+compare_combine_buy_atc_campaign_sum_df['impression'] = compare_combine_buy_atc_campaign_df['impression'].sum()
+compare_combine_buy_atc_campaign_sum_df['click'] = compare_combine_buy_atc_campaign_df['click'].sum()
+compare_combine_buy_atc_campaign_sum_df['cost'] = compare_combine_buy_atc_campaign_df['cost'].sum()
+compare_combine_buy_atc_campaign_sum_df['buy value'] = compare_combine_buy_atc_campaign_df['buy value'].sum()
+compare_combine_buy_atc_campaign_sum_df['buy conversions'] = compare_combine_buy_atc_campaign_df['buy conversions'].sum()
+compare_combine_buy_atc_campaign_sum_df['atc conversions'] = compare_combine_buy_atc_campaign_df['atc conversions'].sum()
+compare_combine_buy_atc_campaign_sum_df = compare_combine_buy_atc_campaign_sum_df[['日期范围','impression','click','cost','buy conversions','buy value','atc conversions']]
+compare_combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df(compare_combine_buy_atc_campaign_sum_df,'buy value','cost','ads ROI')
+compare_combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df(compare_combine_buy_atc_campaign_sum_df,'cost','click','CPC')
+compare_combine_buy_atc_campaign_sum_df= add_custom_proportion_to_df_x100(compare_combine_buy_atc_campaign_sum_df,'click','impression','CTR')
+compare_combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df_x100(compare_combine_buy_atc_campaign_sum_df,'buy conversions','click','buy CVR')
+compare_combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df_x100(compare_combine_buy_atc_campaign_sum_df,'atc conversions','click','atc CVR')
+compare_combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(compare_combine_buy_atc_campaign_sum_df,'cost','buy conversions','buy CPA')
+compare_combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(compare_combine_buy_atc_campaign_sum_df,'cost','atc conversions','atc CPA')
+compare_combine_buy_atc_campaign_sum_df = add_custom_proportion_to_df(compare_combine_buy_atc_campaign_sum_df,'buy value','buy conversions','AOV')
+
+all_combine_buy_atc_campaign_sum_df = create_compare_summary_df(combine_buy_atc_campaign_sum_df, compare_combine_buy_atc_campaign_sum_df,['日期范围','impression','click','cost','buy conversions','buy value','atc conversions','ads ROI','CPC','CTR','buy CVR','atc CVR','buy CPA','atc CPA','AOV'])
+all_combine_buy_atc_campaign_sum_df = all_combine_buy_atc_campaign_sum_df.apply(format_comparison, axis=1)
+st.subheader("综合数据")
+st.dataframe(all_combine_buy_atc_campaign_sum_df,width=2000, height=200,column_config=column_config)
