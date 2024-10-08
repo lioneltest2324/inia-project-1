@@ -40,20 +40,26 @@ unique_conversion_action = ads_conversion_daily['conversion action'].unique()
 
 ads_campaign_daily = output_groupby_df(ads_campaign_daily,['Date'], ['impression','cost','click'], 'sum').reset_index()
 ads_conversion_daily = output_groupby_df(ads_conversion_daily,['Date','conversion action'], ['all conversions','all conversion value'], 'sum').reset_index()
-combine_campaign_df = pd.merge(ads_conversion_daily,ads_campaign_daily,on=['Date'], how='left')
-
+# combine_campaign_df = pd.merge(ads_conversion_daily,ads_campaign_daily,on=['Date'], how='left')
+combine_campaign_df = pd.merge(ads_campaign_daily,ads_conversion_daily,on=['Date'], how='left')
 
 before_combine_df = pd.merge(ads_campaign_daily,ads_conversion_daily,on=['Date'], how='left')
-buy_combine_df = before_combine_df[before_combine_df['conversion action'].isin(["Purchase"])]
-atc_combine_df = before_combine_df[before_combine_df['conversion action'].isin(["Add to cart"])]
+
+buy_combine_df = before_combine_df[before_combine_df['conversion action'].isin(["theinia.com (web) purchase"])]
+atc_combine_df = before_combine_df[before_combine_df['conversion action'].isin(["theinia.com (web) add_to_cart"])]
+
 atc_combine_df = atc_combine_df.drop(columns=['impression','cost','click','conversion action'])
 buy_combine_df['buy conversions'] = buy_combine_df['all conversions']
 buy_combine_df['buy value'] = buy_combine_df['all conversion value']
 buy_combine_df = buy_combine_df.drop(columns=['all conversions','all conversion value','conversion action'])
-all_combine_action_df = pd.merge(buy_combine_df,atc_combine_df,on=['Date'], how='left')
+all_combine_action_df = pd.merge(atc_combine_df,buy_combine_df,on=['Date'], how='left')
+
 all_combine_action_df = all_combine_action_df.drop(columns=['all conversion value'])
 all_combine_action_df['atc conversions'] = all_combine_action_df['all conversions']
 all_combine_action_df = all_combine_action_df.drop(columns=['all conversions'])
+all_combine_action_df = all_combine_action_df.drop(columns=['impression','cost','click'])
+all_combine_action_df = pd.merge(ads_campaign_daily,all_combine_action_df,on=['Date'], how='left')
+
 all_combine_action_df= add_custom_proportion_to_df(all_combine_action_df,'buy value','cost','ads ROI')
 all_combine_action_df= add_custom_proportion_to_df(all_combine_action_df,'cost','click','CPC')
 all_combine_action_df= add_custom_proportion_to_df_x100(all_combine_action_df,'click','impression','CTR')
@@ -66,7 +72,7 @@ st.dataframe(all_combine_action_df,width=1800, height=600,column_config=column_c
 conversion_action_options = st.multiselect(
     '选择转化操作',
     unique_conversion_action,
-    ['Purchase']
+    ['theinia.com (web) purchase']
 )
 combine_campaign_df = combine_campaign_df[combine_campaign_df['conversion action'].isin(conversion_action_options)]
 ads_daliy_summary_df = output_groupby_df(combine_campaign_df,['Date'], ['impression','cost','click','all conversions','all conversion value'], 'sum').reset_index()
